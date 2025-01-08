@@ -1,70 +1,87 @@
-# Getting Started with Create React App
+# App Setup, Overview, and Challenges Faced
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## App Setup
 
-## Available Scripts
+### Prerequisites
+- Node.js and npm
+- MongoDB
+- Environment Variables:
+  - .env file is not deleted for your convenience
 
-In the project directory, you can run:
+### Installation Steps
+1. **Clone the Repository:**
+   ```bash
+   git clone <repository-url>
+   cd <repository-directory>
+   ```
 
-### `npm start`
+2. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+3. **Set Up Environment Variables:**
+   - Create a `.env` file in the root directory.
+   - Add the required environment variables:
+     ```
+     SECRET_KEY
+     NODE_ENV=development
+     BACKEND_URL=http://localhost:5000/
+     ```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+4. **Start the Application:**
+   ```bash
+   npm start
+   ```
 
-### `npm test`
+5. **Run the Backend Server:**
+   Navigate to the backend directory and start the server:
+   ```bash
+   cd backend
+   npm install
+   npm start
+   ```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+6. **Ensure MongoDB is Running:**
+   ```bash
+   mongod
+   ```
 
-### `npm run build`
+## App Overview
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Features
+1. **User Authentication:**
+   - Registration, Login, Logout
+   - JWT-based authentication (will be updated to httpOnly in  future)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. **Task Management:**
+   - Create, Read, Update, Delete (CRUD) tasks
+   - Toggle task completion status
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. **Protected Routes:**
+   - Middleware to authenticate users via JWT
 
-### `npm run eject`
+4. **Error Handling:**
+   - Proper error messages for authentication failures and server issues
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+5. **Frontend Integration:**
+   - React-based frontend making API calls to the backend
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Technologies Used
+- **Frontend:** React, Axios
+- **Backend:** Node.js, Express, mongoose
+- **Database:** MongoDB
+- **Authentication:** JWT, bcrypt.js
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Challenges Faced
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 1. **JWT Authentication Issues**
+   - **Problem:** The JWT token was not being set correctly in the httpOnly cookie.
+   - **Solution:**
+     - Used localstorage for now.
+     - Verified the token format and expiration settings.
+     - Debugged with `console.log` to ensure the token is being set and verified correctly.
 
-## Learn More
+## Conclusion
+Despite facing challenges during the development process, the application was successfully implemented with MVC architecture, robust authentication, task management features, and seamless frontend-backend integration. Future improvements may include enhanced error handling, additional user features, and scalability optimizations.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
