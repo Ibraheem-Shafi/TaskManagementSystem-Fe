@@ -14,9 +14,9 @@ const Signup = () => {
 
     try {
       const response = await registerUser({ email, password });
-      // if (response.data.token) {
-      //   localStorage.setItem("authToken", response.data.token);
-      // }
+      if (response.data.token) {
+        localStorage.setItem("authToken", response.data.token);
+      }
       let userId = response.data.userId;
       navigate(`/dashboard/${userId}`);
     } catch (err) {

@@ -182,7 +182,7 @@ export const toggleTaskStatus = (id) => async (dispatch) => {
     const response = await toggleTodoInDatabase(id); // API call to toggle the task status
     dispatch(toggleTask(id)); // Dispatch the toggleTask action with the updated task data
   } catch (error) {
-    dispatch(setError('Failed to toggle task status')); // Handle error
+    dispatch(setError('Failed to toggle task status'));
   } finally {
     dispatch(setLoading(false)); // Set loading to false once the request completes
   }

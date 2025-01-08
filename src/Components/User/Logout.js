@@ -14,6 +14,7 @@ const Logout = () => {
 
       // Clear localStorage items
       localStorage.removeItem('userId');
+      localStorage.removeItem('authToken');
 
       // Display a success message using react-toastify
       toast.success('You have successfully logged out!');

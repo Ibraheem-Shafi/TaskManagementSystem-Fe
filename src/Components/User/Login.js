@@ -14,9 +14,9 @@ const Login = () => {
 
     try {
       const response = await userLogin({ email, password });
-      // if (response.data.token) {
-      //   localStorage.setItem("authToken", response.data.token);
-      // }
+      if (response.data.token) {
+        localStorage.setItem("authToken", response.data.token);
+      }
       if (response.data.user.userId) {
         localStorage.setItem("userId", response.data.user.userId);
       }
