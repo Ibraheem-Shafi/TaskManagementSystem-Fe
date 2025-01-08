@@ -2,13 +2,16 @@ import { createSlice } from '@reduxjs/toolkit';
 import { fetchTasksFromDatabase, addTaskToDatabase, editTaskInDatabase, deleteTaskFromDatabase, toggleTodoInDatabase } from '../Server/api'; 
 
 const initialState = {
-  tasks: [],  // Changed 'todos' to 'tasks'
+  tasks: [],
+  filteredTasks: [],
+  dueDateFilter: '',
+  statusFilter: '',
   loading: false,
   error: null,
 };
 
 const taskSlice = createSlice({
-  name: 'tasks',  // Changed 'todos' to 'tasks'
+  name: 'tasks',
   initialState,
   reducers: {
     setLoading: (state, action) => {
@@ -18,26 +21,92 @@ const taskSlice = createSlice({
       state.error = action.payload;
     },
     setTasks: (state, action) => {
-      state.tasks = action.payload;  // Changed 'todos' to 'tasks'
+      state.tasks = action.payload;
+      state.filteredTasks = action.payload; // Update filteredTasks when tasks are set
     },
     addTask: (state, action) => {
-      state.tasks.push(action.payload);  // Changed 'todos' to 'tasks'
+      state.tasks.push(action.payload);
+      state.filteredTasks.push(action.payload); // Ensure filteredTasks is updated
     },
     editTask: (state, action) => {
-        const { id, updatedTask } = action.payload;
-        const index = state.tasks.findIndex(task => task._id === id); // Use _id or whatever field is used to identify the task
-        if (index !== -1) {
-          state.tasks[index] = { ...state.tasks[index], ...updatedTask }; // Update the task in the state
-        }
+      const { id, updatedTask } = action.payload;
+      const index = state.tasks.findIndex(task => task._id === id);
+      if (index !== -1) {
+        state.tasks[index] = { ...state.tasks[index], ...updatedTask };
+        // Reapply the filters after editing the task
+        state.filteredTasks = state.tasks.filter(task => {
+          return (
+            (state.dueDateFilter ? task.dueDate.split('T')[0] === state.dueDateFilter : true) &&
+            (state.statusFilter ? task.status === state.statusFilter : true)
+          );
+        });
+      }
     },
     deleteTask: (state, action) => {
-        state.tasks = state.tasks.filter(task => task._id !== action.payload);  // Changed 'todos' to 'tasks'
+      state.tasks = state.tasks.filter(task => task._id !== action.payload);
+      // Reapply the filters after deleting the task
+      state.filteredTasks = state.tasks.filter(task => {
+        return (
+          (state.dueDateFilter ? task.dueDate.split('T')[0] === state.dueDateFilter : true) &&
+          (state.statusFilter ? task.status === state.statusFilter : true)
+        );
+      });
     },
     toggleTask: (state, action) => {
-        const index = state.tasks.findIndex(task => task.id === action.payload);
-        if (index !== -1) {
-          state.tasks[index].completed = !state.tasks[index].completed; // Toggle the `completed` status
+      const index = state.tasks.findIndex(task => task._id === action.payload);
+      if (index !== -1) {
+        // Cycle through the statuses
+        switch (state.tasks[index].status) {
+          case 'Pending':
+            state.tasks[index].status = 'In Progress';
+            break;
+          case 'In Progress':
+            state.tasks[index].status = 'Completed';
+            break;
+          case 'Completed':
+            state.tasks[index].status = 'Pending';
+            break;
+          default:
+            state.tasks[index].status = 'Pending';
+            break;
         }
+        // Reapply the filters after toggling the task's status
+        state.filteredTasks = state.tasks.filter(task => {
+          return (
+            (state.dueDateFilter ? task.dueDate.split('T')[0] === state.dueDateFilter : true) &&
+            (state.statusFilter ? task.status === state.statusFilter : true)
+          );
+        });
+      }
+    },
+    setDueDateFilter: (state, action) => {
+      state.dueDateFilter = action.payload;
+      // Reapply the filter after changing the dueDateFilter
+      state.filteredTasks = state.tasks.filter(task => {
+        return (
+          (state.dueDateFilter ? task.dueDate.split('T')[0] === state.dueDateFilter : true) &&
+          (state.statusFilter ? task.status === state.statusFilter : true)
+        );
+      });
+    },
+    setStatusFilter: (state, action) => {
+      state.statusFilter = action.payload;
+      // Reapply the filter after changing the statusFilter
+      state.filteredTasks = state.tasks.filter(task => {
+        return (
+          (state.dueDateFilter ? task.dueDate.split('T')[0] === state.dueDateFilter : true) &&
+          (state.statusFilter ? task.status === state.statusFilter : true)
+        );
+      });
+    },
+    setFilteredTasks: (state) => {
+      // Apply both dueDateFilter and statusFilter here
+      state.filteredTasks = state.tasks.filter(task => {
+        return (
+          (state.dueDateFilter ? task.dueDate.split('T')[0] === state.dueDateFilter : true) &&
+          (state.statusFilter ? task.status === state.statusFilter : true)
+        );
+      });
     }
   },
 });
@@ -49,21 +118,25 @@ export const {
   toggleTask,
   setLoading,
   setError,
-  setTasks
+  setTasks,
+  setDueDateFilter,
+  setStatusFilter,
+  setFilteredTasks
 } = taskSlice.actions;
 
 // Async Thunks
 
-export const fetchTasks = () => async (dispatch) => {
-    dispatch(setLoading(true));
-    try {
-      const response = await fetchTasksFromDatabase();  // Removed userId as it's now handled by backend auth
-      dispatch(setTasks(response.data));  // Store the tasks in the Redux store
-    } catch (error) {
-      dispatch(setError('Failed to fetch tasks'));
-    } finally {
-      dispatch(setLoading(false));
-    }
+export const fetchTasks = (userId) => async (dispatch) => {
+  dispatch(setLoading(true));
+  try {
+    const response = await fetchTasksFromDatabase(userId);
+    dispatch(setTasks(response.data));  // Store the tasks in the Redux store
+    dispatch(setFilteredTasks());  // Apply the initial filters
+  } catch (error) {
+    dispatch(setError('Failed to fetch tasks'));
+  } finally {
+    dispatch(setLoading(false));
+  }
 };
 
 export const addNewTask = (task) => async (dispatch) => {
@@ -103,16 +176,16 @@ export const deleteTaskById = (id) => async (dispatch) => {
 };
 
 export const toggleTaskStatus = (id) => async (dispatch) => {
-    dispatch(setLoading(true)); // Set loading to true while the request is in progress
-    try {
-      // Call the backend API to toggle the task's completion status
-      const response = await toggleTodoInDatabase(id); // API call to toggle the task status
-      dispatch(toggleTask(response.data.id)); // Dispatch the toggleTask action with the id of the toggled task
-    } catch (error) {
-      dispatch(setError('Failed to toggle task status')); // Handle error
-    } finally {
-      dispatch(setLoading(false)); // Set loading to false once the request completes
-    }
-  };
+  dispatch(setLoading(true)); // Set loading to true while the request is in progress
+  try {
+    // Call the backend API to toggle the task's status
+    const response = await toggleTodoInDatabase(id); // API call to toggle the task status
+    dispatch(toggleTask(id)); // Dispatch the toggleTask action with the updated task data
+  } catch (error) {
+    dispatch(setError('Failed to toggle task status')); // Handle error
+  } finally {
+    dispatch(setLoading(false)); // Set loading to false once the request completes
+  }
+};
 
 export default taskSlice.reducer;

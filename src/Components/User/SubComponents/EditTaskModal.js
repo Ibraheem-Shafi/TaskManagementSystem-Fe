@@ -1,6 +1,10 @@
-import React from 'react';
-
-const EditTaskModal = ({ showEditModal, setShowEditModal, editTaskText, setEditTaskText, handleEditTask }) => {
+const EditTaskModal = ({
+  showEditModal,
+  setShowEditModal,
+  editTaskDetails,
+  setEditTaskDetails,
+  handleEditTask
+}) => {
   return (
     showEditModal && (
       <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-10">
@@ -8,10 +12,28 @@ const EditTaskModal = ({ showEditModal, setShowEditModal, editTaskText, setEditT
           <h2 className="text-xl mb-4">Edit Task</h2>
           <input
             type="text"
-            value={editTaskText}
-            onChange={(e) => setEditTaskText(e.target.value)}
+            value={editTaskDetails.title}
+            onChange={(e) =>
+              setEditTaskDetails({ ...editTaskDetails, title: e.target.value })
+            }
             className="w-full p-2 border border-gray-300 rounded-md mb-4"
-            placeholder="Edit your task"
+            placeholder="Edit title"
+          />
+          <textarea
+            value={editTaskDetails.description}
+            onChange={(e) =>
+              setEditTaskDetails({ ...editTaskDetails, description: e.target.value })
+            }
+            className="w-full p-2 border border-gray-300 rounded-md mb-4"
+            placeholder="Edit description"
+          />
+          <input
+            type="date"
+            value={editTaskDetails.dueDate}
+            onChange={(e) =>
+              setEditTaskDetails({ ...editTaskDetails, dueDate: e.target.value })
+            }
+            className="w-full p-2 border border-gray-300 rounded-md mb-4"
           />
           <div className="flex justify-between">
             <button

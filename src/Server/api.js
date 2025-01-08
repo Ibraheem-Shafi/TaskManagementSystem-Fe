@@ -25,7 +25,6 @@ export const userLogout = async () => {
         withCredentials: true // Include credentials to send httpOnly cookies
     });
 };
-
 // Tasks
 
 export const fetchTasksFromDatabase = async (userId) => {

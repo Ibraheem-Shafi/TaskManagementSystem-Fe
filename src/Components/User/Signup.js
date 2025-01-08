@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { registerUser } from './../../Server/api';
 
 const Signup = () => {
@@ -14,6 +14,9 @@ const Signup = () => {
 
     try {
       const response = await registerUser({ email, password });
+      if (response.data.token) {
+        localStorage.setItem("authToken", response.data.token);
+      }
       let userId = response.data.userId;
       navigate(`/dashboard/${userId}`);
     } catch (err) {
@@ -59,7 +62,7 @@ const Signup = () => {
           </button>
         </form>
         <div className="mt-4 text-center">
-          <p className="text-gray-700">Already have an account? <a href="/login" className="text-blue-500 hover:underline">Login</a></p>
+          <p className="text-gray-700">Already have an account? <Link href="/login" className="text-blue-500 hover:underline">Login</Link></p>
         </div>
       </div>
     </div>
